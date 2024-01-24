@@ -6,49 +6,32 @@ MainLayout::MainLayout(QWidget *parent)
 {
     uncheckpixmap = new QPixmap (":/check/image/UnChecked_new.png");
     checkpixmap = new QPixmap (":/check/image/UnChecked_png.png");
-
-    res1_list = new QListView(this);
-    res2_list = new QListView(this);
-    res3_list = new QListView(this);
-    res4_list = new QListView(this);
-    res5_list = new QListView(this);
-    res6_list = new QListView(this);
-    res7_list = new QListView(this);
-    res8_list = new QListView(this);
+    font.setPointSize(14);
+    for(int i = 0;i<ARRAY;i++)
+    {
+        res_list[i] = new QListView(this);
+        res_list[i]->setFont(font);
+        res_ischecked[i] = true;
+        res_button[i] = new QPushButton(this);
+        res_button[i]->setFont(font);
+    }
 
     Temperature_list = new QListView(this);
     Humidity_list = new QListView(this);
     heat1_list = new QListView(this);
 
-    res1_list->setGeometry(290, 40, 101, 35);
-    res2_list->setGeometry(490, 40, 101, 35);
-    res3_list->setGeometry(690, 40, 101, 35);
-    res4_list->setGeometry(890, 40, 101, 35);
-    res5_list->setGeometry(290, 90, 101, 35);
-    res6_list->setGeometry(490, 90, 101, 35);
-    res7_list->setGeometry(690, 90, 101, 35);
-    res8_list->setGeometry(890, 90, 101, 35);
+    res_list[0]->setGeometry(290, 40, 101, 35);
+    res_list[1]->setGeometry(490, 40, 101, 35);
+    res_list[2]->setGeometry(690, 40, 101, 35);
+    res_list[3]->setGeometry(890, 40, 101, 35);
+    res_list[4]->setGeometry(290, 90, 101, 35);
+    res_list[5]->setGeometry(490, 90, 101, 35);
+    res_list[6]->setGeometry(690, 90, 101, 35);
+    res_list[7]->setGeometry(890, 90, 101, 35);
     Temperature_list->setGeometry(30, 40, 101, 35);
     Humidity_list->setGeometry(30, 90, 101, 35);
     heat1_list->setGeometry(1050, 90, 101, 35);
 
-    res1_ischecked = true;
-    res2_ischecked = true;
-    res3_ischecked = true;
-    res4_ischecked = true;
-    res5_ischecked = true;
-    res6_ischecked = true;
-    res7_ischecked = true;
-    res8_ischecked = true;
-
-    res1_button = new QPushButton(this);
-    res2_button = new QPushButton(this);
-    res3_button = new QPushButton(this);
-    res4_button = new QPushButton(this);
-    res5_button = new QPushButton(this);
-    res6_button = new QPushButton(this);
-    res7_button = new QPushButton(this);
-    res8_button = new QPushButton(this);
     savebutton = new QPushButton(this);
     beginbutton = new QPushButton(this);
     stopbutton = new QPushButton(this);
@@ -138,66 +121,33 @@ void MainLayout::axisInit()
     // 将垂直布局设置为容器部件的布局
     container->setLayout(cruve_layout);
     // 设置容器部件的位置和大小
-    container->setGeometry(20, 160, 1000, 500);
+    container->setGeometry(20, 150, 1000, 550);
 
 }
 void MainLayout::setButtonIcon()
 {
-    //设置位置
-    res1_button->setGeometry(240, 40, 50, 35);
-    res2_button->setGeometry(440, 40, 50, 35);
-    res3_button->setGeometry(640, 40, 50, 35);
-    res4_button->setGeometry(840, 40, 50, 35);
-    res5_button->setGeometry(240, 90, 50, 35);
-    res6_button->setGeometry(440, 90, 50, 35);
-    res7_button->setGeometry(640, 90, 50, 35);
-    res8_button->setGeometry(840, 90, 50, 35);
-    //设置通道数字
-    res1_button->setText(QString::number(1));
-    res2_button->setText(QString::number(2));
-    res3_button->setText(QString::number(3));
-    res4_button->setText(QString::number(4));
-    res5_button->setText(QString::number(5));
-    res6_button->setText(QString::number(6));
-    res7_button->setText(QString::number(7));
-    res8_button->setText(QString::number(8));
-    // 将文本与图标一起显示
-    res1_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res2_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res3_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res4_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res5_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res6_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res7_button->setStyleSheet("text-align:right; padding-right:0px;");
-    res8_button->setStyleSheet("text-align:right; padding-right:0px;");
-    //显示默认图标
-    res1_button->setIcon(*checkpixmap);
-    res2_button->setIcon(*checkpixmap);
-    res3_button->setIcon(*checkpixmap);
-    res4_button->setIcon(*checkpixmap);
-    res5_button->setIcon(*checkpixmap);
-    res6_button->setIcon(*checkpixmap);
-    res7_button->setIcon(*checkpixmap);
-    res8_button->setIcon(*checkpixmap);
-    //设置图标大小
-    res1_button->setIconSize(QSize(35, 35));
-    res2_button->setIconSize(QSize(35, 35));
-    res3_button->setIconSize(QSize(35, 35));
-    res4_button->setIconSize(QSize(35, 35));
-    res5_button->setIconSize(QSize(35, 35));
-    res6_button->setIconSize(QSize(35, 35));
-    res7_button->setIconSize(QSize(35, 35));
-    res8_button->setIconSize(QSize(35, 35));
-    // 设置无边框显示
-    res1_button->setFlat(true);
-    res2_button->setFlat(true);
-    res3_button->setFlat(true);
-    res4_button->setFlat(true);
-    res5_button->setFlat(true);
-    res6_button->setFlat(true);
-    res7_button->setFlat(true);
-    res8_button->setFlat(true);
+    QPalette palette;
 
+    //设置位置
+    res_button[0]->setGeometry(240, 40, 50, 35);
+    res_button[1]->setGeometry(440, 40, 50, 35);
+    res_button[2]->setGeometry(640, 40, 50, 35);
+    res_button[3]->setGeometry(840, 40, 50, 35);
+    res_button[4]->setGeometry(240, 90, 50, 35);
+    res_button[5]->setGeometry(440, 90, 50, 35);
+    res_button[6]->setGeometry(640, 90, 50, 35);
+    res_button[7]->setGeometry(840, 90, 50, 35);
+
+    for(int i = 0;i<ARRAY;i++) {
+        res_button[i]->setText(QString::number(i));//设置通道数字
+        palette = res_button[i]->palette();
+        palette.setColor(QPalette::ButtonText, Graph_color[i]);
+        res_button[i]->setPalette(palette);
+        res_button[i]->setStyleSheet("text-align:right; padding-right:0px;");// 将文本与图标一起显示
+        res_button[i]->setIcon(*checkpixmap);//显示默认图标
+        res_button[i]->setIconSize(QSize(35, 35));//设置图标大小
+        res_button[i]->setFlat(true);    // 设置无边框显示
+    }
 
     savebutton->setGeometry(0, 0, 90, 35);
     savebutton->setIcon(QIcon(":/check/image/saveBtn-up.png"));

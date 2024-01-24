@@ -15,7 +15,21 @@
 #include <QFont>
 #include <QLabel>
 #include <QVBoxLayout>
+
+#define ARRAY 8
 using namespace QtCharts;
+
+const QColor Graph_color[ARRAY] = {
+    QColor(255, 0, 0),//大红
+    QColor(0, 255, 0),//黑色
+    QColor(0, 0, 255),//Cyan
+    QColor(255, 0, 255),//MediumSeaGreen
+    QColor(255, 125, 0),//goldenrod
+    QColor(0, 255, 255),//SandyBrown
+    QColor(0, 0, 0),//DarkSeaGreen3
+    QColor(125, 125, 0),//Gold2
+    };
+
 
 class MainLayout : public QWidget{
 
@@ -25,15 +39,9 @@ public:
     ~MainLayout();
     friend class MainWindow;
 private:
+
     //listview 显示
-    QListView* res1_list;
-    QListView* res2_list;
-    QListView* res3_list;
-    QListView* res4_list;
-    QListView* res5_list;
-    QListView* res6_list;
-    QListView* res7_list;
-    QListView* res8_list;
+    QListView* res_list[ARRAY];
     QListView* Temperature_list;
     QListView* Humidity_list;
     QListView* heat1_list;
@@ -47,28 +55,14 @@ private:
     QCheckBox* res7_box;
     QCheckBox* res8_box;
 
-    QPushButton *res1_button;
-    QPushButton *res2_button;
-    QPushButton *res3_button;
-    QPushButton *res4_button;
-    QPushButton *res5_button;
-    QPushButton *res6_button;
-    QPushButton *res7_button;
-    QPushButton *res8_button;
+    QPushButton *res_button[ARRAY];
     QPushButton *savebutton;
     QPushButton *beginbutton;
     QPushButton *stopbutton;
     QPushButton *clearbutton;
     QPushButton *heatbutton;
 
-    bool res1_ischecked;
-    bool res2_ischecked;
-    bool res3_ischecked;
-    bool res4_ischecked;
-    bool res5_ischecked;
-    bool res6_ischecked;
-    bool res7_ischecked;
-    bool res8_ischecked;
+    bool res_ischecked[ARRAY];
 
     QPixmap *uncheckpixmap;
     QPixmap *checkpixmap;
