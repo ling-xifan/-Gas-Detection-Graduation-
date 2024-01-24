@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/check">
+        <file>image/UnChecked_new.png</file>
+        <file>image/UnChecked_png.png</file>
+        <file>image/saveBtn-up.png</file>
+        <file>image/begin.png</file>
+        <file>image/clear.png</file>
+        <file>image/stop.png</file>
+        <file>image/send_heat.png</file>
+    </qresource>
+</RCC>
