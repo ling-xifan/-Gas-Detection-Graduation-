@@ -15,7 +15,7 @@
 #include <QFont>
 #include <QLabel>
 #include <QVBoxLayout>
-
+#include <QLineEdit>
 #define ARRAY 8
 using namespace QtCharts;
 
@@ -44,7 +44,7 @@ private:
     QListView* res_list[ARRAY];
     QListView* Temperature_list;
     QListView* Humidity_list;
-    QListView* heat1_list;
+    QLineEdit* heat_edit;
 
     QCheckBox* res1_box;
     QCheckBox* res2_box;

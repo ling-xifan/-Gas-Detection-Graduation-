@@ -2,6 +2,66 @@
 
 
 /**
+ * @brief 构造函数
+ */
+
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    // 创建布局对象并设置给主窗口
+    resize(1280, 720);
+    layout = new MainLayout(this);
+    setCentralWidget(layout);
+
+    start_flag = 0;
+    read_flag = 0;
+    save_cnt = 0;
+    x_max = 50;
+    tcpClient = new QTcpSocket(this);   //实例化tcpClient;
+    timer = new QTimer;
+    file = new QFile();
+
+    array_signal.resize(ARRAY, vector<float>(BUFFERSIZE));
+    RH_signal.resize(BUFFERSIZE);
+    Temperature_signal.resize(BUFFERSIZE);
+
+    msgBox.setWindowTitle(u8"提示");
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setDefaultButton(QMessageBox::Yes);
+
+    for (int i = 0; i < ARRAY; i++) {
+        series[i] = new QLineSeries;
+    }
+    for (int i = 0; i < ARRAY + 2; i++) {
+        model_text[i] = new QStringListModel(text_content[i]);
+    }
+    connect(layout->res_button[0], &QPushButton::clicked,this,&MainWindow::setCheckBox1Icno);
+    connect(layout->res_button[1], &QPushButton::clicked,this,&MainWindow::setCheckBox2Icno);
+    connect(layout->res_button[2], &QPushButton::clicked,this,&MainWindow::setCheckBox3Icno);
+    connect(layout->res_button[3], &QPushButton::clicked,this,&MainWindow::setCheckBox4Icno);
+    connect(layout->res_button[4], &QPushButton::clicked,this,&MainWindow::setCheckBox5Icno);
+    connect(layout->res_button[5], &QPushButton::clicked,this,&MainWindow::setCheckBox6Icno);
+    connect(layout->res_button[6], &QPushButton::clicked,this,&MainWindow::setCheckBox7Icno);
+    connect(layout->res_button[7], &QPushButton::clicked,this,&MainWindow::setCheckBox8Icno);
+    connect(layout->beginbutton, &QPushButton::clicked,this,&MainWindow::startCollection);
+    connect(layout->stopbutton, &QPushButton::clicked,this,&MainWindow::stopCollection);
+    connect(layout->clearbutton, &QPushButton::clicked,this,&MainWindow::clearData);
+    connect(layout->heatbutton, &QPushButton::clicked,this,&MainWindow::sendVolt);
+    connect(layout->savebutton, &QPushButton::clicked,this,&MainWindow::saveDataAsTxt);
+
+}
+
+MainWindow::~MainWindow()
+{
+}
+/**
+ * @brief 空线程函数
+ */
+void idle_thread() {
+    //do nothing
+}
+
+/**
  * @brief 在绘制线程中绘制折线图
  *
  * @param start 起始索引
@@ -18,9 +78,12 @@ void MainWindow::drawThread(int start, int end)
         } else {
             series[num]->setPen(QColor(0,0,0,0));//通道隐藏
         }
-
-        for (int i = 0; i <= 50; i++) {
-            series[num]->append(50-i, array_signal[num][i]/1000);
+        if(x_max < save_cnt) {
+            x_max = save_cnt;
+            layout->axisX->setRange(0, x_max);
+        }
+        for (int i = 0; i <= x_max; i++) {
+            series[num]->append(x_max-i, array_signal[num][i]/1000);
         }
 
         text_content[num].clear();
@@ -43,60 +106,6 @@ void MainWindow::drawThread(int start, int end)
         layout->res_list[ARRAY+1]->update();
     }
      qDebug() << "draw end" << endl;//debug
-}
-
-/**
- * @brief 构造函数
- */
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
-    // 创建布局对象并设置给主窗口
-    resize(1280, 720);
-    layout = new MainLayout(this);
-    setCentralWidget(layout);
-
-    start_flag = 0;
-    read_flag = 0;
-
-    tcpClient = new QTcpSocket(this);   //实例化tcpClient;
-    timer = new QTimer;
-    array_signal.resize(ARRAY, vector<float>(BUFFERSIZE));
-    RH_signal.resize(BUFFERSIZE);
-    Temperature_signal.resize(BUFFERSIZE);
-    msgBox.setWindowTitle(u8"提示");
-    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-    msgBox.setDefaultButton(QMessageBox::Yes);
-
-    for (int i = 0; i < ARRAY; i++) {
-        series[i] = new QLineSeries;
-    }
-    for (int i = 0; i < ARRAY + 2; i++) {
-        model_text[i] = new QStringListModel(text_content[i]);
-    }
-    connect(layout->res_button[0], &QPushButton::clicked,this,&MainWindow::setCheckBox1Icno);
-    connect(layout->res_button[1], &QPushButton::clicked,this,&MainWindow::setCheckBox2Icno);
-    connect(layout->res_button[2], &QPushButton::clicked,this,&MainWindow::setCheckBox3Icno);
-    connect(layout->res_button[3], &QPushButton::clicked,this,&MainWindow::setCheckBox4Icno);
-    connect(layout->res_button[4], &QPushButton::clicked,this,&MainWindow::setCheckBox5Icno);
-    connect(layout->res_button[5], &QPushButton::clicked,this,&MainWindow::setCheckBox6Icno);
-    connect(layout->res_button[6], &QPushButton::clicked,this,&MainWindow::setCheckBox7Icno);
-    connect(layout->res_button[7], &QPushButton::clicked,this,&MainWindow::setCheckBox8Icno);
-    connect(layout->beginbutton, &QPushButton::clicked,this,&MainWindow::startCollection);
-    connect(layout->stopbutton, &QPushButton::clicked,this,&MainWindow::stopCollection);
-    connect(layout->clearbutton, &QPushButton::clicked,this,&MainWindow::clearData);
-
-}
-
-MainWindow::~MainWindow()
-{
-}
-/**
- * @brief 空线程函数
- */
-void idle_thread() {
-    //do nothing
 }
 
 /**
@@ -188,7 +197,7 @@ void MainWindow::clearData()
             layout->res_list[i]->update();
             series[i]->clear();
         }
-
+        save_cnt = 0;
         array_signal.clear();
         RH_signal.clear();
         Temperature_signal.clear();
@@ -206,7 +215,11 @@ void MainWindow::storeMessage()
     read_flag = 1;
     read_buffer = tcpClient->readAll();
     qDebug() << "read begin" << endl;//debug
+    if (save_cnt < BUFFERSIZE) save_cnt++;                  //用来判断数据是否超过了设定的数据量
     for(int i = 0;i<ARRAY;i++) {
+        if (save_cnt >= BUFFERSIZE) {
+            array_signal.at(i).pop_back();
+        }
         buf_0 = ((uint)(read_buffer.at(4 * i + 0)) << 0 ) & 0x000000ff;
         buf_1 = ((uint)(read_buffer.at(4 * i + 1)) << 8 ) & 0x0000ff00;
         buf_2 = ((uint)(read_buffer.at(4 * i + 2)) << 16) & 0x00ff0000;
@@ -221,7 +234,7 @@ void MainWindow::storeMessage()
         }
 
     }
-     //   qDebug() << "read end" << endl;//debug
+    //   qDebug() << "read end" << endl;//debug
     buf_0 = ((uint)read_buffer.at(4 * 8))&0x000000ff;
     buf_1 = ((uint)(read_buffer.at(4 * 8 + 1)) << 8) & 0x0000ff00;
     buf_2 = ((uint)(read_buffer.at(4 * 8 + 2)) << 16) & 0x00ff0000;
@@ -260,6 +273,85 @@ void MainWindow::drawGraph()
         layout->draw_curve->addSeries(series[j]);
         layout->draw_curve->setAxisX(layout->axisX, series[j]);
         layout->draw_curve->setAxisY(layout->axisY, series[j]);
+    }
+}
+/**
+ * @brief 发送电压
+ */
+void MainWindow::sendVolt()
+{
+    QString volt = layout->heat_edit->text();
+    bool isValid = false;
+
+    int value = volt.toInt(&isValid);
+    //检验数据合法
+    if (isValid && value >= 0 && value <= 5) {
+        volt +=volt;//双通道
+        qDebug()<<"volt:"<<volt<<endl;
+        if(start_flag) {
+            tcpClient->write(volt.toLatin1());        //发电压
+        }else {
+
+            tcpClient->abort();                 //取消原有连接
+            tcpClient->connectToHost(ServerIP, port);
+            if (tcpClient->waitForConnected(1000)) {
+                tcpClient->write(volt.toLatin1());        //发电压
+            }else {
+                msgBox.setText(u8"服务器连接失败");
+                msgBox.exec();
+            }
+       }
+    }else {
+        msgBox.setText(u8"输入数据无效");
+        msgBox.exec();
+
+    }
+}
+/**
+ * @brief 数据保存为.TxT
+ */
+void MainWindow::saveDataAsTxt()
+{
+    QString save_fileName = QFileDialog::getSaveFileName(this, "Save",
+        QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation),
+        "text files(*.txt)");
+    QFile file(save_fileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append))
+    {
+        //QMessageBox::warning(this, "Error", u8"打开失败", QMessageBox::Yes);
+        return;
+    }
+    QTextStream in(&file);
+
+    for (int i = save_cnt - 1; i >= 0; i--) //越往上越靠近初始
+    {
+        for(int j = 0; j < ARRAY; j++)
+        {
+            in << "	" << array_signal[j][i];
+        }
+        in << "	" << RH_signal[i];
+        in << "	" << Temperature_signal[i];
+        in << "\n";
+    }
+
+    file.close();
+}
+/**
+ * @brief 重写closeEvent: 确认退出对话框
+ */
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    msgBox.setText(u8"确认退出程序？");
+    mesbox_result = msgBox.exec();
+
+    if(mesbox_result==QMessageBox::No)
+    {
+        event->ignore(); // 忽略退出信号，程序继续进行
+    }
+    else if(mesbox_result==QMessageBox::Yes)
+    {
+        event->accept(); // 接受退出信号，程序退出
     }
 }
 
@@ -330,4 +422,3 @@ void MainWindow::setCheckBox8Icno()
     layout->res_ischecked[7] = !layout->res_ischecked[7];
     this->setCheckBoxIcon();
 }
-

@@ -8,6 +8,10 @@
 #include <QTimer>
 #include <thread>
 #include <cmath>
+#include <QFile>
+#include <QDir>
+#include <QFileDialog>
+#include <QStandardPaths>
 #include <QStringListModel>
 #include <QtNetwork/QTcpSocket>                 //通信套接字//对方的(客户端的)套接字(通信套接字)
 #include "MainWindowLayout.h"
@@ -40,16 +44,20 @@ private:
     QStringList text_content[ARRAY+2];//记录文本的变量
     QStringListModel *model_text[ARRAY+2];
     std::thread* array_graph[THREAD_NUM];
+    QFile *file;
 
     vector<vector<float>> array_signal;//二维数组保存采集数据
     vector<float> Temperature_signal;//温度数组
     vector<float> RH_signal;//湿度数组
     int mesbox_result;
+    int save_cnt;
+    int x_max;
     QByteArray read_buffer;
     bool start_flag;
     bool read_flag;
 
     void setCheckBoxIcon();
+    void closeEvent(QCloseEvent *event);    // 重写closeEvent的申明
 private slots:
 
     void setCheckBox1Icno();
@@ -67,6 +75,8 @@ private slots:
     void drawThread(int start, int end);
     void stopCollection();
     void clearData();
+    void sendVolt();
+    void saveDataAsTxt();
 
 };
 #endif // MAINWINDOW_H

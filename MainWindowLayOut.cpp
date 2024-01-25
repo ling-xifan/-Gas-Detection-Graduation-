@@ -18,7 +18,9 @@ MainLayout::MainLayout(QWidget *parent)
 
     Temperature_list = new QListView(this);
     Humidity_list = new QListView(this);
-    heat1_list = new QListView(this);
+    heat_edit = new QLineEdit(this);
+    heat_edit->setFont(font);
+    heat_edit->setText("5");
 
     res_list[0]->setGeometry(290, 40, 101, 35);
     res_list[1]->setGeometry(490, 40, 101, 35);
@@ -30,7 +32,9 @@ MainLayout::MainLayout(QWidget *parent)
     res_list[7]->setGeometry(890, 90, 101, 35);
     Temperature_list->setGeometry(30, 40, 101, 35);
     Humidity_list->setGeometry(30, 90, 101, 35);
-    heat1_list->setGeometry(1050, 90, 101, 35);
+    heat_edit->setGeometry(1050, 90, 101, 35);
+    Humidity_list->setFont(font);
+    Temperature_list->setFont(font);
 
     savebutton = new QPushButton(this);
     beginbutton = new QPushButton(this);
